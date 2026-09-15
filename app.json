@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "tab",
+    "name": "",
     "slug": "tab",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/kolabo-icon.png",
     "scheme": "tab",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -29,7 +29,7 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/kolabo-icon.png",
           "imageWidth": 76
         }
       ]
