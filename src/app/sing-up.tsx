@@ -83,7 +83,7 @@ export default function SignUp() {
       await updateProfile(credential.user, { displayName: fullName.trim() });
       // onAuthStateChanged in AuthContext picks this up automatically —
       // route to wherever a signed-in user should land.
-      router.replace("/(tabs)");
+      router.replace("/(profile-setup)/complete-profile");
     } catch (err: any) {
       setErrorMessage(getFirebaseErrorMessage(err?.code ?? ""));
     } finally {

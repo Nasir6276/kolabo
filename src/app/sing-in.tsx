@@ -1,7 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -12,14 +14,32 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { auth } from "../lib/firebase";
 
 const INK = "#1B1F3B";
 const MUTED = "#6B7280";
 const FIELD_BG = "#EEF1FB";
 const FIELD_BORDER_FOCUSED = INK;
 const PLACEHOLDER = "#8A8FA3";
+const ERROR = "#D64545";
 
 type FieldKey = "email" | "password";
+
+function getFirebaseErrorMessage(code: string): string {
+  switch (code) {
+    case "auth/invalid-email":
+      return "That email address looks invalid.";
+    case "auth/user-not-found":
+    case "auth/invalid-credential":
+      return "No account matches that email and password.";
+    case "auth/wrong-password":
+      return "Incorrect password. Please try again.";
+    case "auth/too-many-requests":
+      return "Too many attempts. Please wait a moment and try again.";
+    default:
+      return "Something went wrong. Please try again.";
+  }
+}
 
 export default function SignIn() {
   const router = useRouter();
@@ -31,11 +51,33 @@ export default function SignIn() {
   const [focusedField, setFocusedField] = useState<FieldKey | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const goBack = () => router.back();
   const goToSignUp = () => router.push("/sing-up");
 
-  const handleSignIn = () => {
-    // TODO: wire up to your sign-in endpoint
+  const goToForgotPassword = () => router.push("/forgot-password");
+
+  const handleSignIn = async () => {
+    setErrorMessage(null);
+
+    if (!email.trim() || !password) {
+      setErrorMessage("Please enter both email and password.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+      // onAuthStateChanged in AuthContext picks this up automatically —
+      // route to wherever a signed-in user should land.
+      router.replace("/(tabs)");
+    } catch (err: any) {
+      setErrorMessage(getFirebaseErrorMessage(err?.code ?? ""));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -61,6 +103,12 @@ export default function SignIn() {
         >
           <Text style={styles.title}>Sign in</Text>
 
+          {errorMessage && (
+            <View style={styles.errorBanner}>
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            </View>
+          )}
+
           <View style={styles.form}>
             <TextInput
               style={[
@@ -76,6 +124,7 @@ export default function SignIn() {
               keyboardType="email-address"
               autoCapitalize="none"
               returnKeyType="next"
+              editable={!isSubmitting}
             />
 
             <View
@@ -94,6 +143,8 @@ export default function SignIn() {
                 onBlur={() => setFocusedField(null)}
                 secureTextEntry={!showPassword}
                 returnKeyType="done"
+                editable={!isSubmitting}
+                onSubmitEditing={handleSignIn}
               />
               <TouchableOpacity
                 onPress={() => setShowPassword((prev) => !prev)}
@@ -108,16 +159,24 @@ export default function SignIn() {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.forgotPasswordRow}>
+          <TouchableOpacity
+            style={styles.forgotPasswordRow}
+            onPress={goToForgotPassword}
+          >
             <Text style={styles.forgotPasswordText}>Forgot password?</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.signInButton}
+            style={[styles.signInButton, isSubmitting && styles.buttonDisabled]}
             activeOpacity={0.9}
             onPress={handleSignIn}
+            disabled={isSubmitting}
           >
-            <Text style={styles.signInButtonText}>Sign in</Text>
+            {isSubmitting ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.signInButtonText}>Sign in</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity onPress={goToSignUp} style={styles.signUpRow}>
@@ -156,7 +215,18 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: INK,
     textAlign: "center",
-    marginBottom: 50,
+    marginBottom: 24,
+  },
+  errorBanner: {
+    backgroundColor: "#FDECEC",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 16,
+  },
+  errorText: {
+    color: ERROR,
+    fontSize: 13,
+    textAlign: "center",
   },
   form: {
     gap: 16,
@@ -205,6 +275,9 @@ const styles = StyleSheet.create({
     paddingVertical: 17,
     alignItems: "center",
     marginTop: 24,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   signInButtonText: {
     color: "#FFFFFF",
