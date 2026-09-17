@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 
-export default function Explore() {
+export default function builds() {
   return (
     <View
       style={{
@@ -9,7 +9,7 @@ export default function Explore() {
         alignItems: "center",
       }}
     >
-      <Text style={{ fontSize: 32, fontWeight: "bold" }}>Explore</Text>
+      <Text style={{ fontSize: 32, fontWeight: "bold" }}>Builds</Text>
     </View>
   );
 }

@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 
-export default function Wallet() {
+export default function Post() {
   return (
     <View
       style={{
@@ -9,7 +9,7 @@ export default function Wallet() {
         alignItems: "center",
       }}
     >
-      <Text style={{ fontSize: 32, fontWeight: "bold" }}>Wallet</Text>
+      <Text style={{ fontSize: 32, fontWeight: "bold" }}>Explore</Text>
     </View>
   );
 }
