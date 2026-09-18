@@ -7,14 +7,7 @@ import { CATEGORIES, DUMMY_IDEAS } from "@/data/dummyIdeas";
 import { Idea } from "@/types/idea";
 import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const INK = "#1B1F3B";
@@ -75,9 +68,6 @@ export default function Home() {
                   style={styles.searchInput}
                 />
               </View>
-              <TouchableOpacity style={styles.filterButton} activeOpacity={0.8}>
-                <Ionicons name="options-outline" size={20} color={INK} />
-              </TouchableOpacity>
             </View>
 
             <CategoryChips
@@ -133,14 +123,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   searchInput: { flex: 1, fontSize: 14, color: INK },
-  filterButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 10,
-    backgroundColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   sectionHeader: { paddingHorizontal: 20, marginTop: 8, marginBottom: 10 },
   sectionTitle: { fontSize: 16, fontWeight: "700", color: INK },
   featuredList: { paddingHorizontal: 20, marginBottom: 20 },
