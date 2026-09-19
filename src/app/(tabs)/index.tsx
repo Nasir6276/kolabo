@@ -1,22 +1,17 @@
-import { useAuth } from "@/components/AuthContext";
 import CategoryChips from "@/components/CategoryChips";
 import FeaturedCard from "@/components/FeaturedCard";
 import HomeHeader from "@/components/HomeHeader";
 import IdeaCard from "@/components/IdeaCard";
 import { CATEGORIES, DUMMY_IDEAS } from "@/data/dummyIdeas";
+import { colors, radius, spacing } from "@/theme/colors";
 import { Idea } from "@/types/idea";
 import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const INK = "#1B1F3B";
-const MUTED = "#6B7280";
-
 export default function Home() {
-  const { user } = useAuth();
   const insets = useSafeAreaInsets();
-  const firstName = user?.displayName?.split(" ")[0] ?? "there";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -39,12 +34,11 @@ export default function Home() {
   }, [selectedCategory, searchQuery]);
 
   const handleIdeaPress = (idea: Idea) => {
-    // navigate to idea detail screen once it exists
     console.log("Pressed idea:", idea.id);
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 12 }]}>
+    <View style={[styles.container, { paddingTop: insets.top + spacing.md }]}>
       <FlatList
         data={filteredIdeas}
         keyExtractor={(item) => item.id}
@@ -52,17 +46,17 @@ export default function Home() {
           <IdeaCard idea={item} onPress={handleIdeaPress} />
         )}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxl }}
         ListHeaderComponent={
           <>
             <HomeHeader />
 
             <View style={styles.searchRow}>
               <View style={styles.searchBar}>
-                <Ionicons name="search" size={18} color={MUTED} />
+                <Ionicons name="search" size={17} color={colors.textMuted} />
                 <TextInput
                   placeholder="Search ideas or keywords"
-                  placeholderTextColor={MUTED}
+                  placeholderTextColor={colors.textMuted}
                   value={searchQuery}
                   onChangeText={setSearchQuery}
                   style={styles.searchInput}
@@ -77,7 +71,8 @@ export default function Home() {
             />
 
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Trending ideas</Text>
+              <Text style={styles.sectionTitle}>Trending</Text>
+              <Text style={styles.sectionLink}>See all</Text>
             </View>
             <FlatList
               data={featuredIdeas}
@@ -92,6 +87,9 @@ export default function Home() {
 
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>All ideas</Text>
+              <Text style={styles.resultCount}>
+                {filteredIdeas.length} results
+              </Text>
             </View>
           </>
         }
@@ -101,29 +99,47 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FAFBFF" },
-  header: { paddingHorizontal: 20, marginBottom: 16 },
-  greeting: { fontSize: 24, fontWeight: "700", color: INK },
-  subGreeting: { fontSize: 14, color: MUTED, marginTop: 2 },
+  container: { flex: 1, backgroundColor: colors.background },
   searchRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
-    gap: 10,
-    marginBottom: 16,
+    paddingHorizontal: spacing.xl,
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
   },
   searchBar: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    paddingHorizontal: 14,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.md,
     height: 44,
-    gap: 8,
+    gap: spacing.sm,
   },
-  searchInput: { flex: 1, fontSize: 14, color: INK },
-  sectionHeader: { paddingHorizontal: 20, marginTop: 8, marginBottom: 10 },
-  sectionTitle: { fontSize: 16, fontWeight: "700", color: INK },
-  featuredList: { paddingHorizontal: 20, marginBottom: 20 },
+  searchInput: { flex: 1, fontSize: 14, color: colors.textPrimary },
+  filterButton: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.xl,
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  sectionTitle: { fontSize: 16, fontWeight: "700", color: colors.textPrimary },
+  sectionLink: { fontSize: 12, fontWeight: "600", color: colors.accent },
+  resultCount: { fontSize: 12, color: colors.textMuted, fontWeight: "500" },
+  featuredList: { paddingHorizontal: spacing.xl, marginBottom: spacing.xl },
 });

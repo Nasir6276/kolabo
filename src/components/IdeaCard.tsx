@@ -1,9 +1,6 @@
+import { colors, radius, spacing } from "@/theme/colors";
 import { Idea } from "@/types/idea";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
-const INK = "#1B1F3B";
-const ACCENT = "#F2A93B";
-const MUTED = "#6B7280";
 
 type Props = {
   idea: Idea;
@@ -13,6 +10,7 @@ type Props = {
 export default function IdeaCard({ idea, onPress }: Props) {
   const rolesFilled = idea.rolesTotal - idea.rolesOpen;
   const progress = idea.rolesTotal > 0 ? rolesFilled / idea.rolesTotal : 0;
+  const isFull = idea.rolesOpen === 0;
 
   return (
     <TouchableOpacity
@@ -21,11 +19,18 @@ export default function IdeaCard({ idea, onPress }: Props) {
       onPress={() => onPress?.(idea)}
     >
       <View style={styles.headerRow}>
-        <Image
-          source={{ uri: idea.postedBy.avatarUrl }}
-          style={styles.avatar}
-        />
-        <Text style={styles.postedBy}>{idea.postedBy.name}</Text>
+        <View style={styles.posterRow}>
+          <Image
+            source={{ uri: idea.postedBy.avatarUrl }}
+            style={styles.avatar}
+          />
+          <Text style={styles.postedBy}>{idea.postedBy.name}</Text>
+        </View>
+        <View style={[styles.statusPill, isFull && styles.statusPillFull]}>
+          <Text style={[styles.statusText, isFull && styles.statusTextFull]}>
+            {isFull ? "Team full" : `${idea.rolesOpen} open`}
+          </Text>
+        </View>
       </View>
 
       <Text style={styles.title} numberOfLines={1}>
@@ -43,17 +48,8 @@ export default function IdeaCard({ idea, onPress }: Props) {
         ))}
       </View>
 
-      <View style={styles.footerRow}>
-        <View style={styles.progressTrack}>
-          <View
-            style={[styles.progressFill, { width: `${progress * 100}%` }]}
-          />
-        </View>
-        <Text style={styles.rolesText}>
-          {idea.rolesOpen === 0
-            ? "Team full"
-            : `${idea.rolesOpen} role${idea.rolesOpen > 1 ? "s" : ""} open`}
-        </Text>
+      <View style={styles.progressTrack}>
+        <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
       </View>
     </TouchableOpacity>
   );
@@ -61,38 +57,66 @@ export default function IdeaCard({ idea, onPress }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    padding: 16,
-    marginHorizontal: 20,
-    marginBottom: 14,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    marginHorizontal: spacing.xl,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  headerRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
-  avatar: { width: 24, height: 24, borderRadius: 12, marginRight: 8 },
-  postedBy: { fontSize: 12, color: MUTED, fontWeight: "500" },
-  title: { fontSize: 16, fontWeight: "700", color: INK, marginBottom: 4 },
-  description: { fontSize: 13, color: MUTED, lineHeight: 18, marginBottom: 10 },
-  tagsRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginBottom: 12 },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.md,
+  },
+  posterRow: { flexDirection: "row", alignItems: "center" },
+  avatar: { width: 22, height: 22, borderRadius: 11, marginRight: spacing.sm },
+  postedBy: { fontSize: 12, color: colors.textSecondary, fontWeight: "500" },
+  statusPill: {
+    backgroundColor: colors.surfaceSubtle,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    borderRadius: radius.full,
+  },
+  statusPillFull: { backgroundColor: colors.surfaceSubtle },
+  statusText: { fontSize: 10, fontWeight: "700", color: colors.accent },
+  statusTextFull: { color: colors.textMuted },
+  title: {
+    fontSize: 15.5,
+    fontWeight: "700",
+    color: colors.textPrimary,
+    marginBottom: 4,
+  },
+  description: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    lineHeight: 18,
+    marginBottom: spacing.md,
+  },
+  tagsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginBottom: spacing.md,
+  },
   tag: {
-    backgroundColor: "#EEF1FB",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceSubtle,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    borderRadius: radius.sm,
   },
-  tagText: { fontSize: 11, fontWeight: "600", color: INK },
-  footerRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  tagText: { fontSize: 11, fontWeight: "600", color: colors.inkSoft },
   progressTrack: {
-    flex: 1,
-    height: 5,
-    backgroundColor: "#EEF1FB",
-    borderRadius: 3,
+    height: 4,
+    backgroundColor: colors.surfaceSubtle,
+    borderRadius: 2,
     overflow: "hidden",
   },
-  progressFill: { height: "100%", backgroundColor: ACCENT, borderRadius: 3 },
-  rolesText: { fontSize: 11, fontWeight: "600", color: MUTED },
+  progressFill: {
+    height: "100%",
+    backgroundColor: colors.accent,
+    borderRadius: 2,
+  },
 });

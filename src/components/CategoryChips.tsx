@@ -1,7 +1,5 @@
+import { colors, radius, spacing } from "@/theme/colors";
 import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
-
-const INK = "#1B1F3B";
-const ACCENT = "#F2A93B";
 
 type Props = {
   categories: string[];
@@ -40,15 +38,17 @@ export default function CategoryChips({
 }
 
 const styles = StyleSheet.create({
-  container: { paddingHorizontal: 20, gap: 8, paddingVertical: 4 },
+  container: { paddingHorizontal: spacing.xl, paddingVertical: spacing.xs },
   chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#EEF1FB",
-    marginRight: 8,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginRight: spacing.sm,
   },
-  chipActive: { backgroundColor: INK },
-  chipText: { fontSize: 13, fontWeight: "600", color: INK },
-  chipTextActive: { color: ACCENT },
+  chipActive: { backgroundColor: colors.ink, borderColor: colors.ink },
+  chipText: { fontSize: 13, fontWeight: "600", color: colors.textSecondary },
+  chipTextActive: { color: "#fff" },
 });

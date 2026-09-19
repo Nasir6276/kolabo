@@ -20,4 +20,5 @@ export type Idea = {
     avatarUrl: string;
   };
   isFeatured?: boolean;
+  imageUrl?: string;
 };

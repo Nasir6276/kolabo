@@ -1,11 +1,9 @@
 import { useAuth } from "@/components/AuthContext";
+import { colors, radius, spacing } from "@/theme/colors";
 import { getGreeting } from "@/utils/greeting";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
-const INK = "#1B1F3B";
-const MUTED = "#6B7280";
 
 type Props = {
   hasUnreadNotifications?: boolean;
@@ -28,16 +26,18 @@ export default function HomeHeader({ hasUnreadNotifications = false }: Props) {
         resizeMode="contain"
       />
 
-      <Text style={styles.greeting} numberOfLines={1}>
-        {greeting}, {firstName}
-      </Text>
+      <View style={styles.greetingWrap}>
+        <Text style={styles.greeting} numberOfLines={1}>
+          {greeting}, <Text style={styles.name}>{firstName}</Text>
+        </Text>
+      </View>
 
       <TouchableOpacity
         onPress={goToNotifications}
         style={styles.notificationButton}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
-        <Ionicons name="notifications-outline" size={22} color={INK} />
+        <Ionicons name="notifications-outline" size={21} color={colors.ink} />
         {hasUnreadNotifications && <View style={styles.badge} />}
       </TouchableOpacity>
     </View>
@@ -49,32 +49,31 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
-    marginBottom: 16,
+    paddingHorizontal: spacing.xl,
+    marginBottom: spacing.xl,
   },
-  logo: { width: 32, height: 32 },
-  greeting: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: MUTED,
-    flex: 1,
-    textAlign: "center",
-    marginHorizontal: 8,
-  },
+  logo: { width: 30, height: 30 },
+  greetingWrap: { flex: 1, alignItems: "center" },
+  greeting: { fontSize: 13, fontWeight: "500", color: colors.textSecondary },
+  name: { color: colors.textPrimary, fontWeight: "700" },
   notificationButton: {
     width: 36,
     height: 36,
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceSubtle,
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
   },
   badge: {
     position: "absolute",
-    top: 6,
-    right: 6,
-    width: 8,
-    height: 8,
+    top: 7,
+    right: 7,
+    width: 7,
+    height: 7,
     borderRadius: 4,
-    backgroundColor: "#D64545",
+    backgroundColor: colors.danger,
+    borderWidth: 1.5,
+    borderColor: colors.surfaceSubtle,
   },
 });

@@ -1,6 +1,4 @@
-import { Idea } from "@/types/idea";
-
-import { Category } from "@/types/idea";
+import { Category, Idea } from "@/types/idea";
 
 export const DUMMY_IDEAS: Idea[] = [
   {
@@ -16,6 +14,7 @@ export const DUMMY_IDEAS: Idea[] = [
       avatarUrl: "https://i.pravatar.cc/100?img=1",
     },
     isFeatured: true,
+    imageUrl: "https://picsum.photos/seed/kolabo1/400/300",
   },
   {
     id: "2",
@@ -27,6 +26,7 @@ export const DUMMY_IDEAS: Idea[] = [
     rolesTotal: 3,
     postedBy: { name: "Tobi A.", avatarUrl: "https://i.pravatar.cc/100?img=2" },
     isFeatured: true,
+    imageUrl: "https://picsum.photos/seed/kolabo2/400/300",
   },
   {
     id: "3",
@@ -41,6 +41,7 @@ export const DUMMY_IDEAS: Idea[] = [
       avatarUrl: "https://i.pravatar.cc/100?img=3",
     },
     isFeatured: true,
+    imageUrl: "https://picsum.photos/seed/kolabo3/400/300",
   },
   {
     id: "4",
