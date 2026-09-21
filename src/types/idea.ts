@@ -21,4 +21,8 @@ export type Idea = {
   };
   isFeatured?: boolean;
   imageUrl?: string;
+  requirements: string[];
+  skillsNeeded: string[];
+  timeframe: string;
+  location: string;
 };

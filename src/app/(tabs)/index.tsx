@@ -6,11 +6,13 @@ import { CATEGORIES, DUMMY_IDEAS } from "@/data/dummyIdeas";
 import { colors, radius, spacing } from "@/theme/colors";
 import { Idea } from "@/types/idea";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Home() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,7 +36,7 @@ export default function Home() {
   }, [selectedCategory, searchQuery]);
 
   const handleIdeaPress = (idea: Idea) => {
-    console.log("Pressed idea:", idea.id);
+    router.push({ pathname: "/idea/[id]", params: { id: idea.id } });
   };
 
   return (
