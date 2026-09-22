@@ -2,7 +2,7 @@ import { colors, radius, spacing } from "@/theme/colors";
 import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
 
 type Props = {
-  categories: string[];
+  categories: readonly string[];
   selected: string;
   onSelect: (category: string) => void;
 };

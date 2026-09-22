@@ -8,13 +8,18 @@ export type Category =
   | "Education"
   | "Social Impact";
 
+export type Role = {
+  id: string;
+  title: string;
+  isFilled: boolean;
+};
+
 export type Idea = {
   id: string;
   title: string;
   description: string;
   categories: Category[];
-  rolesOpen: number;
-  rolesTotal: number;
+  roles: Role[];
   postedBy: {
     name: string;
     avatarUrl: string;
@@ -22,7 +27,6 @@ export type Idea = {
   isFeatured?: boolean;
   imageUrl?: string;
   requirements: string[];
-  skillsNeeded: string[];
   timeframe: string;
   location: string;
 };

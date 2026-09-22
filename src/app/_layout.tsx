@@ -1,4 +1,5 @@
 import { AuthProvider, useAuth } from "@/components/AuthContext";
+import { IdeasProvider } from "@/components/IdeasContext";
 import { Stack } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 
@@ -34,7 +35,9 @@ function RootNavigator() {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <RootNavigator />
+      <IdeasProvider>
+        <RootNavigator />
+      </IdeasProvider>
     </AuthProvider>
   );
 }

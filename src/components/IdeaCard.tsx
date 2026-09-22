@@ -1,5 +1,6 @@
 import { colors, radius, spacing } from "@/theme/colors";
 import { Idea } from "@/types/idea";
+import { getRoleStats } from "@/utils/roles";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
@@ -8,9 +9,8 @@ type Props = {
 };
 
 export default function IdeaCard({ idea, onPress }: Props) {
-  const rolesFilled = idea.rolesTotal - idea.rolesOpen;
-  const progress = idea.rolesTotal > 0 ? rolesFilled / idea.rolesTotal : 0;
-  const isFull = idea.rolesOpen === 0;
+  const { total, open, progress } = getRoleStats(idea.roles);
+  const isFull = open === 0;
 
   return (
     <TouchableOpacity
@@ -28,7 +28,7 @@ export default function IdeaCard({ idea, onPress }: Props) {
         </View>
         <View style={[styles.statusPill, isFull && styles.statusPillFull]}>
           <Text style={[styles.statusText, isFull && styles.statusTextFull]}>
-            {isFull ? "Team full" : `${idea.rolesOpen} open`}
+            {isFull ? "Team full" : `${open} open`}
           </Text>
         </View>
       </View>

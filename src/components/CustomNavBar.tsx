@@ -17,6 +17,10 @@ const AnimatedTouchableOpacity =
 const PRIMARY_COLOR = "#1B1F3B";
 const SECONDARY_COLOR = "#fff";
 
+export const NAV_BAR_BOTTOM_OFFSET = 40; // matches container's `bottom`
+export const NAV_BAR_HEIGHT = 54; // paddingVertical(10*2) + tabItem height(34)
+export const NAV_BAR_TOTAL_SPACE = NAV_BAR_BOTTOM_OFFSET + NAV_BAR_HEIGHT;
+
 const CustomNavBar: React.FC<BottomTabBarProps> = ({
   state,
   descriptors,

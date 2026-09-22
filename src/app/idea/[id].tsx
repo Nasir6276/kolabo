@@ -1,5 +1,9 @@
-import { DUMMY_IDEAS } from "@/data/dummyIdeas";
+import ApplyModal from "@/components/ApplyModal";
+import { useIdeas } from "@/components/IdeasContext";
+import SuccessModal from "@/components/SuccessModal";
 import { colors, radius, spacing } from "@/theme/colors";
+import { Role } from "@/types/idea";
+import { getOpenRoles, getRoleStats } from "@/utils/roles";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
@@ -17,11 +21,18 @@ export default function IdeaDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  const { ideas } = useIdeas();
+  const originalIdea = ideas.find((item) => item.id === id);
+
   const [isFavorited, setIsFavorited] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [roles, setRoles] = useState<Role[]>(originalIdea?.roles ?? []);
 
-  const idea = DUMMY_IDEAS.find((item) => item.id === id);
+  const [isSuccessVisible, setIsSuccessVisible] = useState(false);
+  const [appliedRoleTitle, setAppliedRoleTitle] = useState<string | null>(null);
 
-  if (!idea) {
+  if (!originalIdea) {
     return (
       <View
         style={[styles.container, styles.centered, { paddingTop: insets.top }]}
@@ -34,9 +45,22 @@ export default function IdeaDetail() {
     );
   }
 
-  const rolesFilled = idea.rolesTotal - idea.rolesOpen;
-  const progress = idea.rolesTotal > 0 ? rolesFilled / idea.rolesTotal : 0;
-  const isFull = idea.rolesOpen === 0;
+  const idea = { ...originalIdea, roles };
+  const { total, open, progress } = getRoleStats(roles);
+  const openRoles = getOpenRoles(roles);
+  const isFull = open === 0;
+
+  const handleApplySubmit = (roleId: string) => {
+    const role = roles.find((r) => r.id === roleId);
+
+    setRoles((prev) =>
+      prev.map((r) => (r.id === roleId ? { ...r, isFilled: true } : r)),
+    );
+
+    setAppliedRoleTitle(role?.title ?? null);
+    setIsSuccessVisible(true);
+    // TODO: replace with a real submission to your backend/Firestore
+  };
 
   return (
     <View style={styles.container}>
@@ -115,14 +139,38 @@ export default function IdeaDetail() {
 
           <View style={styles.divider} />
 
-          <Text style={styles.sectionLabel}>Skills needed</Text>
-          <View style={styles.skillsRow}>
-            {idea.skillsNeeded.map((skill) => (
-              <View key={skill} style={styles.skillTag}>
-                <Text style={styles.skillTagText}>{skill}</Text>
+          <Text style={styles.sectionLabel}>Available roles</Text>
+          {roles.length === 0 ? (
+            <Text style={styles.listText}>No roles listed for this idea.</Text>
+          ) : (
+            roles.map((role) => (
+              <View key={role.id} style={styles.roleRow}>
+                <View style={styles.roleLeft}>
+                  <View
+                    style={[
+                      styles.roleDot,
+                      {
+                        backgroundColor: role.isFilled
+                          ? colors.textMuted
+                          : colors.ink,
+                      },
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.roleText,
+                      role.isFilled && styles.roleTextFilled,
+                    ]}
+                  >
+                    {role.title}
+                  </Text>
+                </View>
+                {role.isFilled && (
+                  <Text style={styles.roleFilledLabel}>Filled</Text>
+                )}
               </View>
-            ))}
-          </View>
+            ))
+          )}
 
           <View style={styles.divider} />
 
@@ -158,14 +206,12 @@ export default function IdeaDetail() {
               />
             </View>
             <Text style={styles.progressText}>
-              {rolesFilled}/{idea.rolesTotal} filled
+              {total - open}/{total} filled
             </Text>
           </View>
           <View style={[styles.statusPill, isFull && styles.statusPillFull]}>
             <Text style={[styles.statusText, isFull && styles.statusTextFull]}>
-              {isFull
-                ? "Team full"
-                : `${idea.rolesOpen} role${idea.rolesOpen > 1 ? "s" : ""} open`}
+              {isFull ? "Team full" : `${open} role${open > 1 ? "s" : ""} open`}
             </Text>
           </View>
         </View>
@@ -175,11 +221,29 @@ export default function IdeaDetail() {
         <View
           style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}
         >
-          <TouchableOpacity style={styles.applyButton} activeOpacity={0.9}>
+          <TouchableOpacity
+            style={styles.applyButton}
+            activeOpacity={0.9}
+            onPress={() => setIsModalVisible(true)}
+          >
             <Text style={styles.applyButtonText}>Apply to join</Text>
           </TouchableOpacity>
         </View>
       )}
+
+      <ApplyModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        ideaTitle={idea.title}
+        openRoles={openRoles}
+        onSubmit={handleApplySubmit}
+      />
+
+      <SuccessModal
+        visible={isSuccessVisible}
+        onClose={() => setIsSuccessVisible(false)}
+        roleTitle={appliedRoleTitle ?? undefined}
+      />
     </View>
   );
 }
@@ -282,14 +346,35 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  skillsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  skillTag: {
+  roleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  roleLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    flex: 1,
+  },
+  roleDot: { width: 8, height: 8, borderRadius: 4 },
+  roleText: { fontSize: 14, color: colors.textPrimary, fontWeight: "600" },
+  roleTextFilled: {
+    color: colors.textMuted,
+    textDecorationLine: "line-through",
+  },
+  roleFilledLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: colors.textMuted,
     backgroundColor: colors.surfaceSubtle,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
     borderRadius: radius.full,
   },
-  skillTagText: { fontSize: 12, fontWeight: "600", color: colors.inkSoft },
 
   timeframeRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   timeframeText: { fontSize: 14, fontWeight: "600", color: colors.textPrimary },

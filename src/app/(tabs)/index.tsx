@@ -2,7 +2,8 @@ import CategoryChips from "@/components/CategoryChips";
 import FeaturedCard from "@/components/FeaturedCard";
 import HomeHeader from "@/components/HomeHeader";
 import IdeaCard from "@/components/IdeaCard";
-import { CATEGORIES, DUMMY_IDEAS } from "@/data/dummyIdeas";
+import { useIdeas } from "@/components/IdeasContext";
+import { CATEGORIES } from "@/data/dummyIdeas";
 import { colors, radius, spacing } from "@/theme/colors";
 import { Idea } from "@/types/idea";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,13 +19,15 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
+  const { ideas } = useIdeas();
+
   const featuredIdeas = useMemo(
-    () => DUMMY_IDEAS.filter((idea) => idea.isFeatured),
-    [],
+    () => ideas.filter((idea) => idea.isFeatured),
+    [ideas],
   );
 
   const filteredIdeas = useMemo(() => {
-    return DUMMY_IDEAS.filter((idea) => {
+    return ideas.filter((idea) => {
       const matchesCategory =
         selectedCategory === "All" ||
         idea.categories.includes(selectedCategory as any);
@@ -33,7 +36,7 @@ export default function Home() {
         idea.title.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesQuery;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [ideas, selectedCategory, searchQuery]);
 
   const handleIdeaPress = (idea: Idea) => {
     router.push({ pathname: "/idea/[id]", params: { id: idea.id } });
