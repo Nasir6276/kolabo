@@ -1,4 +1,5 @@
 import { useAuth } from "@/components/AuthContext";
+import { NAV_BAR_TOTAL_SPACE } from "@/components/CustomNavBar";
 import { useIdeas } from "@/components/IdeasContext";
 import TagInput from "@/components/TagInput";
 import { CATEGORIES, TIMEFRAME_OPTIONS } from "@/data/dummyIdeas";
@@ -138,7 +139,7 @@ export default function Post() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
-            paddingBottom: insets.bottom + spacing.xxl * 2,
+            paddingBottom: NAV_BAR_TOTAL_SPACE + spacing.xl,
           }}
           keyboardShouldPersistTaps="handled"
         >

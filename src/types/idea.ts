@@ -29,4 +29,6 @@ export type Idea = {
   requirements: string[];
   timeframe: string;
   location: string;
+  fundingNeeded: boolean;
+  fundingAmount?: number;
 };

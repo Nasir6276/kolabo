@@ -28,6 +28,8 @@ export const DUMMY_IDEAS: Idea[] = [
     ],
     timeframe: "3–4 months to MVP",
     location: "Lagos, Nigeria · Remote-friendly",
+    fundingNeeded: true,
+    fundingAmount: 500000,
   },
   {
     id: "2",
@@ -51,6 +53,7 @@ export const DUMMY_IDEAS: Idea[] = [
     ],
     timeframe: "4–6 months to MVP",
     location: "Remote",
+    fundingNeeded: false,
   },
   {
     id: "3",
@@ -79,6 +82,8 @@ export const DUMMY_IDEAS: Idea[] = [
     ],
     timeframe: "5–6 months to MVP",
     location: "Abuja, Nigeria",
+    fundingNeeded: true,
+    fundingAmount: 1200000,
   },
   {
     id: "4",
@@ -104,6 +109,8 @@ export const DUMMY_IDEAS: Idea[] = [
     ],
     timeframe: "3–5 months to MVP",
     location: "Port Harcourt, Nigeria · On-campus",
+    fundingNeeded: true,
+    fundingAmount: 300000,
   },
   {
     id: "5",
@@ -129,6 +136,7 @@ export const DUMMY_IDEAS: Idea[] = [
     ],
     timeframe: "4 months to MVP",
     location: "Remote",
+    fundingNeeded: false,
   },
   {
     id: "6",
@@ -150,6 +158,7 @@ export const DUMMY_IDEAS: Idea[] = [
     ],
     timeframe: "3 months to MVP",
     location: "Lagos, Nigeria · Remote-friendly",
+    fundingNeeded: false,
   },
 ];
 

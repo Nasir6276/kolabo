@@ -3,6 +3,7 @@ import { useIdeas } from "@/components/IdeasContext";
 import SuccessModal from "@/components/SuccessModal";
 import { colors, radius, spacing } from "@/theme/colors";
 import { Role } from "@/types/idea";
+import { formatCurrency } from "@/utils/currency";
 import { getOpenRoles, getRoleStats } from "@/utils/roles";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -197,6 +198,23 @@ export default function IdeaDetail() {
           </View>
 
           <View style={styles.divider} />
+
+          {idea.fundingNeeded && idea.fundingAmount && (
+            <>
+              <View style={styles.divider} />
+              <Text style={styles.sectionLabel}>Funding needed</Text>
+              <View style={styles.timeframeRow}>
+                <Ionicons
+                  name="cash-outline"
+                  size={16}
+                  color={colors.textSecondary}
+                />
+                <Text style={styles.timeframeText}>
+                  {formatCurrency(idea.fundingAmount)}
+                </Text>
+              </View>
+            </>
+          )}
 
           <Text style={styles.sectionLabel}>Team progress</Text>
           <View style={styles.progressRow}>

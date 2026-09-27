@@ -1,6 +1,8 @@
 import { colors, radius, spacing } from "@/theme/colors";
 import { Idea } from "@/types/idea";
+import { formatCurrency } from "@/utils/currency";
 import { getRoleStats } from "@/utils/roles";
+import { Ionicons } from "@expo/vector-icons";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
@@ -51,6 +53,18 @@ export default function IdeaCard({ idea, onPress }: Props) {
       <View style={styles.progressTrack}>
         <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
       </View>
+      {idea.fundingNeeded && idea.fundingAmount && (
+        <View style={styles.fundingRow}>
+          <Ionicons
+            name="cash-outline"
+            size={13}
+            color={colors.textSecondary}
+          />
+          <Text style={styles.fundingText}>
+            {formatCurrency(idea.fundingAmount)} needed
+          </Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 }
@@ -119,4 +133,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.ink,
     borderRadius: 2,
   },
+  fundingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: spacing.sm,
+  },
+  fundingText: { fontSize: 12, fontWeight: "600", color: colors.textSecondary },
 });
