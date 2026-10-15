@@ -1,10 +1,9 @@
 import { useAuth } from "@/components/AuthContext";
-import { NAV_BAR_TOTAL_SPACE } from "@/components/CustomNavBar";
 import { useIdeas } from "@/components/IdeasContext";
 import TagInput from "@/components/TagInput";
 import { CATEGORIES, TIMEFRAME_OPTIONS } from "@/data/dummyIdeas";
 import { colors, radius, spacing } from "@/theme/colors";
-import { Category, Idea, Role } from "@/types/idea";
+import { Category, Role } from "@/types/idea";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -68,7 +67,7 @@ export default function Post() {
     roles.length > 0 &&
     (!fundingNeeded || fundingAmount.trim().length > 0);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setErrorMessage(null);
 
     if (!isValid) {
@@ -78,33 +77,47 @@ export default function Post() {
       return;
     }
 
+    if (!user) {
+      setErrorMessage("You need to be signed in to post an idea.");
+      return;
+    }
+
     setIsSubmitting(true);
 
-    const newIdea: Idea = {
-      id: Date.now().toString(),
-      title: title.trim(),
-      description: description.trim(),
-      categories: selectedCategories,
-      roles: roles.map<Role>((roleTitle, index) => ({
-        id: `${Date.now()}-${index}`,
-        title: roleTitle,
-        isFilled: false,
-      })),
-      postedBy: {
-        name: user?.displayName ?? "Anonymous",
-        avatarUrl: user?.photoURL ?? "https://i.pravatar.cc/100",
-      },
-      imageUrl: imageUri ?? undefined,
-      requirements,
-      timeframe: timeframe ?? "Not specified",
-      location: location.trim() || "Remote",
-      fundingNeeded,
-      fundingAmount: fundingNeeded ? Number(fundingAmount) : undefined,
-    };
+    try {
+      const stamp = Date.now();
 
-    addIdea(newIdea);
-    setIsSubmitting(false);
-    router.push({ pathname: "/idea/[id]", params: { id: newIdea.id } });
+      const newIdea = {
+        title: title.trim(),
+        description: description.trim(),
+        categories: selectedCategories,
+        roles: roles.map<Role>((roleTitle, index) => ({
+          id: `${stamp}-${index}`,
+          title: roleTitle,
+          isFilled: false,
+        })),
+        postedBy: {
+          name: user.displayName ?? "Anonymous",
+          avatarUrl: user.photoURL ?? "https://i.pravatar.cc/100",
+        },
+        ownerId: user.uid,
+        // imageUrl intentionally omitted until Firebase Storage is set up
+        requirements,
+        timeframe: timeframe ?? "Not specified",
+        location: location.trim() || "Remote",
+        fundingNeeded,
+        fundingAmount: fundingNeeded ? Number(fundingAmount) : undefined,
+      };
+
+      const newId = await addIdea(newIdea);
+      router.replace({ pathname: "/idea/[id]", params: { id: newId } });
+    } catch (err: any) {
+      setErrorMessage(
+        err?.message ?? "Couldn't post your idea. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -139,7 +152,7 @@ export default function Post() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
-            paddingBottom: NAV_BAR_TOTAL_SPACE + spacing.xl,
+            paddingBottom: insets.bottom + spacing.xxl * 2,
           }}
           keyboardShouldPersistTaps="handled"
         >

@@ -31,4 +31,5 @@ export type Idea = {
   location: string;
   fundingNeeded: boolean;
   fundingAmount?: number;
+  ownerId?: string;
 };

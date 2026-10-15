@@ -1,23 +1,54 @@
-import { DUMMY_IDEAS } from "@/data/dummyIdeas";
+import { useAuth } from "@/components/AuthContext";
+import { createIdea, NewIdea, subscribeToIdeas } from "@/lib/ideas";
 import { Idea } from "@/types/idea";
-import { createContext, ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 type IdeasContextType = {
   ideas: Idea[];
-  addIdea: (idea: Idea) => void;
+  isLoading: boolean;
+  addIdea: (idea: NewIdea) => Promise<string>;
 };
 
 const IdeasContext = createContext<IdeasContextType | undefined>(undefined);
 
 export function IdeasProvider({ children }: { children: ReactNode }) {
-  const [ideas, setIdeas] = useState<Idea[]>(DUMMY_IDEAS);
+  const { isSignedIn } = useAuth();
+  const [ideas, setIdeas] = useState<Idea[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const addIdea = (idea: Idea) => {
-    setIdeas((prev) => [idea, ...prev]);
-  };
+  useEffect(() => {
+    // rules require auth, so only listen while signed in
+    if (!isSignedIn) {
+      setIdeas([]);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    const unsubscribe = subscribeToIdeas(
+      (data) => {
+        setIdeas(data);
+        setIsLoading(false);
+      },
+      (error) => {
+        console.warn("Failed to load ideas:", error.message);
+        setIsLoading(false);
+      },
+    );
+
+    return unsubscribe;
+  }, [isSignedIn]);
+
+  const addIdea = (idea: NewIdea) => createIdea(idea);
 
   return (
-    <IdeasContext.Provider value={{ ideas, addIdea }}>
+    <IdeasContext.Provider value={{ ideas, isLoading, addIdea }}>
       {children}
     </IdeasContext.Provider>
   );

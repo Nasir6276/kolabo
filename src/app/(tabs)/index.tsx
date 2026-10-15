@@ -1,4 +1,5 @@
 import CategoryChips from "@/components/CategoryChips";
+import EmptyState from "@/components/EmptyState";
 import FeaturedCard from "@/components/FeaturedCard";
 import HomeHeader from "@/components/HomeHeader";
 import IdeaCard from "@/components/IdeaCard";
@@ -9,7 +10,14 @@ import { Idea } from "@/types/idea";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Home() {
@@ -19,12 +27,61 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const { ideas } = useIdeas();
+  const { ideas, isLoading } = useIdeas();
 
   const featuredIdeas = useMemo(
     () => ideas.filter((idea) => idea.isFeatured),
     [ideas],
   );
+
+  const renderEmpty = () => {
+    if (isLoading) {
+      return (
+        <View style={{ paddingVertical: spacing.xxl }}>
+          <ActivityIndicator color={colors.ink} />
+        </View>
+      );
+    }
+
+    // Searching with no matches
+    if (searchQuery.trim().length > 0) {
+      return (
+        <EmptyState
+          icon="search-outline"
+          title="No matches found"
+          message={`Nothing matched "${searchQuery.trim()}". Try a different keyword.`}
+          actionLabel="Clear search"
+          onAction={() => setSearchQuery("")}
+        />
+      );
+    }
+
+    // A category is selected but has no ideas
+    if (selectedCategory !== "All") {
+      return (
+        <EmptyState
+          icon="bulb-outline"
+          title={`No ${selectedCategory} ideas yet`}
+          message="Nobody has posted in this niche yet. Be the first to start something."
+          actionLabel="Post an idea"
+          onAction={() => router.push("/create-post")}
+          secondaryLabel="View all ideas"
+          onSecondaryAction={() => setSelectedCategory("All")}
+        />
+      );
+    }
+
+    // No ideas anywhere
+    return (
+      <EmptyState
+        icon="rocket-outline"
+        title="No ideas yet"
+        message="The feed is empty right now. Post the first idea and get a team together."
+        actionLabel="Post an idea"
+        onAction={() => router.push("/create-post")}
+      />
+    );
+  };
 
   const filteredIdeas = useMemo(() => {
     return ideas.filter((idea) => {
@@ -52,6 +109,7 @@ export default function Home() {
         )}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxl }}
+        ListEmptyComponent={renderEmpty}
         ListHeaderComponent={
           <>
             <HomeHeader />
@@ -75,20 +133,24 @@ export default function Home() {
               onSelect={setSelectedCategory}
             />
 
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Trending</Text>
-              <Text style={styles.sectionLink}>See all</Text>
-            </View>
-            <FlatList
-              data={featuredIdeas}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <FeaturedCard idea={item} onPress={handleIdeaPress} />
-              )}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.featuredList}
-            />
+            {featuredIdeas.length > 0 && (
+              <>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>Trending</Text>
+                  <Text style={styles.sectionLink}>See all</Text>
+                </View>
+                <FlatList
+                  data={featuredIdeas}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => (
+                    <FeaturedCard idea={item} onPress={handleIdeaPress} />
+                  )}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.featuredList}
+                />
+              </>
+            )}
 
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>All ideas</Text>

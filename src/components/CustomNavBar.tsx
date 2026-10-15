@@ -2,6 +2,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { router } from "expo-router";
 import { BottomTabBarProps } from "expo-router/build/react-navigation/bottom-tabs";
 import { useLinkBuilder, useTheme } from "expo-router/react-navigation";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
@@ -43,6 +44,11 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
         const isFocused = state.index === index;
 
         const onPress = () => {
+          if (route.name === "post") {
+            router.push("/create-post");
+            return;
+          }
+
           const event = navigation.emit({
             type: "tabPress",
             target: route.key,
